@@ -63,6 +63,7 @@ class TakeIn{
 				<a href=\'index.php?g='.$_GET['g'].'\'>如果页面未响应请点击此处返回</a>
 				<script language="javascript">';
 		if($user == "" || $user == $this->defaultValue['User']){
+			
 			echo 'alert("用户名不能为空");'.$this->GetWaitJS();
 			$TakeInResult = false;
 		}else

@@ -62,6 +62,7 @@
 	<a class="landing-logo" href="#">
     	<img src="images/misc/logo.png" alt="img">
     </a>
+	<div class="landing-logo" align="center" style="font-family: STKaiti;font-size: 32px;"><?php include('KeyChain.php'); echo $content[$G]['Group'];?></div>
     
     <div class="decoration"></div>
       

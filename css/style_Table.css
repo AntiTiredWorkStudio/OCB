@@ -1,8 +1,11 @@
 @charset "UTF-8";
-
 html, body{
 	padding:0;
-	margin:0;
+	margin-left:0px;
+	margin-right:0px;
+	margin-top:0px;
+	margin-bottom:0px;
+	width:100%;
 	position:relative;
 	background:url(../images/body.jpg);
 	background-repeat:repeat;
@@ -10,20 +13,20 @@ html, body{
 	letter-spacing:1px;
 	font-family:Georgia, "Times New Roman", Times, serif;
 }
-
 .zebra caption{
 	font-size:20px;
 	font-weight:normal;
 	background:url(../images/zebratable.png);
 	background-repeat:no-repeat;
-	background-position: 130px center;
+	background-position: 10px center;
 	padding-top: 20px;
 	height:50px;}
-
-#container{
+.container{
 	padding-top:20px;
-	width:960px;
+	width:100%;
 	margin:0 auto;
+    margin-left: 0px;
+    margin-right: 0px;
 }
 
 table {

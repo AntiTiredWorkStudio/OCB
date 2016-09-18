@@ -9,18 +9,19 @@
 		}
 	?>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title><?php echo $content[$G]['Group'];?>歌单</title>
 	<link rel="stylesheet" href="css/style_Table.css" type="text/css">
-	<link href="css/style_CB.css" rel="stylesheet" type="text/css" />
+	<link href="css/style_CB.css" rel="stylesheet" type="text/css">
 	<style type="text/css">
     .btn{width:323.5px;padding:0;cursor:pointer;display:inline-block;text-align:center;border:1x solid transparent;-webkit-border-radius:2px;-moz-border-radius:2px;border-radius:2px;height:45px;line-height:30px;font-family:"Microsoft Yahei";font-size:15px;border-color:#4E4949;background:#3E3E3E;color:#fff;}
-	.ta{width:300px; height:400px;text-align:left;border:1x solid transparent;-webkit-border-radius:2px;-moz-border-radius:2px;border-radius:2px;height:45px;line-height:30px;font-family:"Microsoft Yahei";font-size:15px;padding:0 15px;border-color:#4E4949;background:#3E3E3E;color:#fff;}
+	.ta{width:100%; height:50%;text-align:left;border:1x solid transparent;-webkit-border-radius:2px;-moz-border-radius:2px;border-radius:2px;height:45px;line-height:30px;font-family:"Microsoft Yahei";font-size:15px;padding:0 15px;border-color:#4E4949;background:#3E3E3E;color:#fff;}
 	</style>
 </head>
 
 <body>
 
-<div id="container">   
+<div align="left" class="container">   
 	<table class="zebra">
     <caption><?php echo $content[$G]['Group'];?>歌单</caption>
 		<thead>
@@ -90,7 +91,6 @@
 	</table>
 	<textarea name="yj" class = "ta" style="
     height: 402px;
-    width: 532px;
 " cols="20" rows="5"><?php echo $slist; ?></textarea>
 	<!--div class="submit">
 		<input type="button" class="btn" style="margin-top: 100px;" onclick="" value="复制歌单" >

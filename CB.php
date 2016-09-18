@@ -29,12 +29,12 @@ include_once('KeyChain.php');
 							<div class="lable">
 		                     	<input type="text" class="text" id="User" name="User" value="你的称呼" onfocus="if (this.value == '你的称呼')this.value = '';" onblur="if (this.value == '') {this.value = '你的称呼';}" >
 
-		                     	<input type="text" class="text" id="Song" name="Song" value="歌曲名称" onfocus="if (this.value == '歌单名称')this.value = '';" onblur="if (this.value == '') {this.value = '歌单名称';}">
+		                     	<input type="text" class="text" id="Song" name="Song" value="歌曲名称" onfocus="if (this.value == '歌曲名称')this.value = '';" onblur="if (this.value == '') {this.value = '歌曲名称';}">
 		                    </div>
 		                    <div class="clear"> </div>
 		                    <div class="lable-2">
 		                    <input type="text" class="text" id="Time" name="Time" value="发歌时间" onfocus="if (this.value == '发歌时间')this.value = '';" onblur="if (this.value == '') {this.value = '发歌时间';}">
-		                     <input type="text" class="text" id="Link" name="Link" value="主页链接 " onfocus="if (this.value == '主页链接')this.value = '';" onblur="if (this.value == '') {this.value = '主页链接';}">
+		                     <input type="text" class="text" id="Link" name="Link" value="主页链接" onfocus="if (this.value == '主页链接')this.value = '';" onblur="if (this.value == '') {this.value = '主页链接';}">
 							</div>
 							<div class="clear"> </div>
 							
