@@ -1,0 +1,4 @@
+﻿#Index#⃣：#UserName# 
+  歌名：《#Song#》
+  时间:#Time#
+  👉主页：#Link#
