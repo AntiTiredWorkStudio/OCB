@@ -1,8 +1,8 @@
 <?php
-	$G = "";
-	if(isset($_GET['g'])){
-		$G = $_GET['g'];
-	}
+$G = "";
+if(isset($_GET['g'])){
+	$G = $_GET['g'];
+}
 	
 	
 
@@ -14,13 +14,69 @@ if(isset($_GET['action'])){
 		case 'initDB':
 			(new CBDBManager($G))->InitTable();
 			break;
+		case 'updateList':
+			(new SongListManager($_POST['Content'],$_POST['List'],$G))->UpdateSongList();
+			break;
 		default:
 			break;
 	}
 }
 
+class SongListManager{
+	var $c = '';
+	var $l = '';
+	var $g = '';
+	var $co = '';
+	function SongListManager($_content,$list,$groupID){
+		include_once('KeyChain.php');
+		$this->c=$_content;
+		$this->l=$list;
+		$this->g=$groupID;
+		$this->co=$content;
+		//echo $_content.$list.$groupID;//.$content;
+	}
+	
+	function UpdateSongList(){
+		file_put_contents($this->co[$this->g]['scontent'],$this->c);
+		file_put_contents($this->co[$this->g]['slist'],$this->l);
+		new CWaitJS();
+	}
+}
 
-
+class CWaitJS{
+	var $WJ = '
+			var secs = 3; //倒计时的秒数 
+			var URL="index.php?g=#GET#";
+			Load(URL);
+			function Load(url){
+				URL = url;
+				for(var i=secs;i>=0;i--) 
+				{ 
+					window.setTimeout("doUpdate(" + i + ")", (secs-i) * 1000); 
+				} 
+			}
+			function doUpdate(num) 
+			{ 
+				document.getElementById("ShowDiv").innerHTML = "将在"+num+"秒后自动跳转到主页" ;
+				if(num == 0) { window.location = URL; }
+			}';
+	function GetWaitJS(){
+		return str_replace('#GET#',$_GET['g'],$this->WJ);
+	}
+	function CWaitJS(){
+		echo '<html>
+				<title>报名结果</title>
+				<body>
+				<ShowDiv id=\'ShowDiv\'></ShowDiv>
+				</br>
+				<a href=\'index.php?g='.$_GET['g'].'\'>如果页面未响应请点击此处返回</a>
+				<script language="javascript">alert("修改成功");';
+		echo $this->GetWaitJS();
+		echo '</script>
+				</body>
+				</html>';
+	}
+}
 
 class TakeIn{
 	var $defaultValue = [

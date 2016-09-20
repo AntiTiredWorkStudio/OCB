@@ -37,6 +37,13 @@ $content = [
 		'DurMax' => 3,
 		'slist' => 'sources/ListModule_10003.txt',
 		'scontent' => 'sources/ContentModule_10003.txt'
+		],
+	'10004'=>[
+		'Group' => '天涯绝情谷',
+		'DayMax' => 5,
+		'DurMax' => 3,
+		'slist' => 'sources/ListModule_10003.txt',
+		'scontent' => 'sources/ContentModule_10003.txt'
 		]
 	];
 ?>

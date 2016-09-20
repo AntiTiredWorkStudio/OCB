@@ -11,6 +11,7 @@ include_once('KeyChain.php');
 		<meta charset="utf-8">
 		<link href="css/style_CB.css" rel="stylesheet" type="text/css" />
 		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title><?php echo $content[$G]['Group'];?>歌曲报名处</title>
 		<script type="application/x-javascript"> 
 			addEventListener(
 				"load", function() { 

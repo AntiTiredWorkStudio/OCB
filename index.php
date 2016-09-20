@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE HTML>
 <?php 
+	include_once('KeyChain.php');
 	$G = "";
 	if(isset($_GET['g'])){
 		$G = $_GET['g'];
@@ -22,7 +23,7 @@
 <link rel="apple-touch-startup-image" sizes="1536x2008" href="images/splash/splash-screen-ipad-portrait-retina.png"   media="(device-width: 768px)	and (orientation: portrait)	and (-webkit-device-pixel-ratio: 2)"/>
 <link rel="apple-touch-startup-image" sizes="1496x2048" href="images/splash/splash-screen-ipad-landscape-retina.png"   media="(device-width: 768px)	and (orientation: landscape)	and (-webkit-device-pixel-ratio: 2)"/>
 
-<title>首页</title>
+<title><?php echo $content[$G]['Group'];?>首页</title>
 
 <link href="styles/style.css"     		rel="stylesheet" type="text/css">
 <link href="styles/framework.css" 		rel="stylesheet" type="text/css">
@@ -87,13 +88,13 @@
         	<img class="nav-image" src="images/general-nature/2s.jpg" alt="img">
             <em>查看歌单</em>
         </a>
-    	<a href="#">
+    	<a href="Model.php<?php echo '?g='.$G; ?>">
         	<img class="nav-icon" src="images/icons/electrical/camera.png" alt="img">
             <div class="nav-overlay"></div>
         	<img class="nav-image" src="images/general-nature/4s.jpg" alt="img">
-            <em>个人中心</em>
+            <em>歌单编辑</em>
         </a>
-    	<a href="#">
+    	<a href="Player.php<?php echo '?g='.$G; ?>">
         	<img class="nav-icon" src="images/icons/media/image2.png" alt="img">
             <div class="nav-overlay"></div>
         	<img class="nav-image" src="images/general-nature/5s.jpg" alt="img">

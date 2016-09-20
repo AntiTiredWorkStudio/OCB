@@ -26,14 +26,18 @@
     <caption><?php echo $content[$G]['Group'];?>歌单</caption>
 		<thead>
         	<tr>
-				<th>歌手称呼</th>
-				<th>发布作品</th>
-				<th>发布时间</th>
-				<th>主页链接</th>
+				<th>歌手</th>
+				<th>作品</th>
+				<th>时间</th>
+				<th>链接</th>
             </tr>
 		</thead>
         <tbody>
 			<?php
+				$buttonTemplate = '
+		<input type="button" class="btn" style="margin-top: 20px;" onclick="window.location.href=\'#GET#\'" value="#btContent#" >';
+				$buttonList = "";
+				$eachButton = "";
 				$scontent = file_get_contents($content[$G]['scontent']);
 				$slist = file_get_contents($content[$G]['slist']);
 				$date = date("Y-m-d",strtotime("+1 day"));
@@ -44,11 +48,12 @@
 				$index = 1;
 				//str_replace("#DB#",$this->options['database'],$this->options['mainTableFormate']);
 				foreach($TodaySongs as $key=>$value){
+					$eachButton = $buttonTemplate;
 					switch(preg_replace('|[0-9/]+|','',$key)){
 						case 'CBName':
 							$content = $scontent;
 							$content = str_replace("#Index#",$index,$content);
-							
+							$buttonList = $buttonList.str_replace('#btContent#',$value,$buttonTemplate);
 							echo '<tr>
 									<td>'.$value.'</td>
 									';
