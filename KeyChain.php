@@ -12,9 +12,11 @@ $options = [
 							 `CBLink` VARCHAR(128) NOT NULL ,
 							 `CBPOSTTIME` TIME NOT NULL ,
 							 `CBPOSTDATE` DATE NOT NULL ,
-							 `CBGroup` VARCHAR(32) NOT NULL
+							 `CBGroup` VARCHAR(32) NOT NULL,
+							 `CBCName` VARCHAR(128) NOT NULL
 							 ) ENGINE = InnoDB DEFAULT CHARSET=UTF8;',
-	'tcc' => 'SqlTable.txt'
+	'tcc' => 'SqlTable.txt',
+	'key' => 'cbword'
 	];
 $content = [
 	'10001'=>[

@@ -42,9 +42,9 @@
 				$eachButton = "";
 				$scontent = file_get_contents($content[$G]['scontent']);
 				$slist = file_get_contents($content[$G]['slist']);
-				$date = date("Y-m-d",strtotime("+1 day"));
+				$date = date("Y-m-d");
 				$group = $content[$G]['Group'];
-				$TodaySongs = (new CBDBManager($G))->GetTodayInfo($G);
+				$TodaySongs = (new CBDBManager($G))->GetLastdayInfo($G);
 				$content = "";
 				$totalContent = "";
 				$index = 1;
@@ -56,7 +56,7 @@
 							$content = $scontent;
 							$content = str_replace("#Index#",$index,$content);
 							$buttonList = $buttonList.str_replace('#btContent#','删除:'.$value,$buttonTemplate);
-							$buttonList = str_replace('#GET#','CBManager.php?action=delete&g='.$G.'&p='.sha1($value),$buttonList);
+							$buttonList = str_replace('#GET#','CBManager.php?action=delete&g='.$G.'&p='.encrypt($value,$options['key']),$buttonList);
 							echo '<tr>
 									<td>'.$value.'</td>
 									';
@@ -109,7 +109,7 @@
 	</div-->
 	<div class="submit">
 		<input type="button" class="btn" style="margin-top: 20px;" onclick="window.location.href='index.php<?php echo '?g='.$G;?>'" value="返回首页" >
-		<?php echo $buttonList;?>
+		
 	</div>
 
 </div>

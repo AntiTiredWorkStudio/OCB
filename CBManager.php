@@ -1,10 +1,12 @@
 <?php
+include_once('KeyChain.php');
 $G = "";
 if(isset($_GET['g'])){
 	$G = $_GET['g'];
 }
-	
-	
+
+
+include_once('Encryption.php');
 
 if(isset($_GET['action'])){
 	switch($_GET['action']){
@@ -17,8 +19,33 @@ if(isset($_GET['action'])){
 		case 'updateList':
 			(new SongListManager($_POST['Content'],$_POST['List'],$G))->UpdateSongList();
 			break;
+		case 'delete':
+			new DeleteItem((new CBDBManager($G))->DeleteItem($_GET['p'],$G));
+			break;
+		case 'creategrp':
+			//(new KeyChainManager())->CreateGroup($_POST['GroupName']);
+			break;
+		case 'fixed':
+			(new CBDBManager($G))->FixedSha1();
+			break;
 		default:
 			break;
+	}
+}
+
+class KeyChainManager{
+	function CreateGroup($groupName){
+	/*	include_once("KeyChain.php");
+		$index = 0;
+		echo $content;*/
+		/*foreach($content as $key=>$value){
+			$index = $key;
+		}
+		echo $key.$groupName;*/
+		
+	}
+	function KeyChainManager(){
+		
 	}
 }
 
@@ -28,10 +55,11 @@ class SongListManager{
 	var $g = '';
 	var $co = '';
 	function SongListManager($_content,$list,$groupID){
-		include_once('KeyChain.php');
+		include('KeyChain.php');
 		$this->c=$_content;
 		$this->l=$list;
 		$this->g=$groupID;
+//		if(isset($content))
 		$this->co=$content;
 		//echo $_content.$list.$groupID;//.$content;
 	}
@@ -39,14 +67,14 @@ class SongListManager{
 	function UpdateSongList(){
 		file_put_contents($this->co[$this->g]['scontent'],$this->c);
 		file_put_contents($this->co[$this->g]['slist'],$this->l);
-		new CWaitJS();
+		new CWaitJS('报名结果','index.php','修改成功');
 	}
 }
 
 class CWaitJS{
 	var $WJ = '
 			var secs = 3; //倒计时的秒数 
-			var URL="index.php?g=#GET#";
+			var URL="#Page#?g=#GET#";
 			Load(URL);
 			function Load(url){
 				URL = url;
@@ -60,18 +88,19 @@ class CWaitJS{
 				document.getElementById("ShowDiv").innerHTML = "将在"+num+"秒后自动跳转到主页" ;
 				if(num == 0) { window.location = URL; }
 			}';
-	function GetWaitJS(){
-		return str_replace('#GET#',$_GET['g'],$this->WJ);
+	function GetWaitJS($linkPage){
+		$result = str_replace('#GET#',$_GET['g'],$this->WJ);
+		return str_replace('#Page#',$linkPage,$result);
 	}
-	function CWaitJS(){
+	function CWaitJS($title,$linkPage,$resultContent){
 		echo '<html>
-				<title>报名结果</title>
+				<title>'.$title.'</title>
 				<body>
 				<ShowDiv id=\'ShowDiv\'></ShowDiv>
 				</br>
-				<a href=\'index.php?g='.$_GET['g'].'\'>如果页面未响应请点击此处返回</a>
-				<script language="javascript">alert("修改成功");';
-		echo $this->GetWaitJS();
+				<a href=\''.$linkPage.'?g='.$_GET['g'].'\'>如果页面未响应请点击此处返回</a>
+				<script language="javascript">alert("'.$resultContent.'");';
+		echo $this->GetWaitJS($linkPage);
 		echo '</script>
 				</body>
 				</html>';
@@ -151,10 +180,14 @@ class TakeIn{
 			$count = 
 				$CBDM->GetTodaySongCount($_GET['g']);
 			//echo($count);
+			if(isset($_COOKIE['OnTakein'.md5($user)]) && $_COOKIE['OnTakein'.md5($user)] == sha1($_POST['User'])){
+				echo 'alert("报的太快啦！");'.$this->GetWaitJS();
+			}else
 			if($count>=5){
 				echo 'alert("今天报名人数已经达到'.$count.'人，请明天再来吧");'.$this->GetWaitJS();
 			}else
 			if(!($CBDM->SelectConditionItems($Condition))){
+				setcookie('OnTakein'.md5($user),sha1($_POST['User']),time()+3600);
 				if($CBDM->InsertElement(
 					$Items,$_GET['g']
 				)){
@@ -168,6 +201,16 @@ class TakeIn{
 		echo '</script>
 				</body>
 				</html>';
+	}
+}
+
+class DeleteItem{
+	function DeleteItem($result){
+		if($result){
+			new CWaitJS('删除结果','Table.php','删除成功');
+		}else{
+			new CWaitJS('删除结果','Table.php','删除失败');
+		}
 	}
 }
 
@@ -190,6 +233,15 @@ class CBDBManager{
 	'tcc' => 'SqlTable.txt'
 	];
 	var $todayCount;
+	
+	function DeleteItem($CBN,$grp){
+		$link = $this->DBLink();
+		$sql = "delete from cbtableothers where CBPOSTDATE=CURRENT_DATE() AND CBCName='".$CBN."'". "AND CBGroup='".$grp."'";
+		//echo $sql;
+		$result = mysql_query($sql,$link);
+		return $result;
+	}
+	
 	function GetCreateTableCommand(){
 		$result = str_replace("#DB#",$this->options['database'],$this->options['mainTableFormate']);
 		$result = str_replace("#TB#",$this->options['mainTable'],$result);
@@ -214,7 +266,6 @@ class CBDBManager{
 			}
 		}
 		$con = $this->DBLink();
-		//echo($sql);
 		$result = mysql_query($sql,$con);
 		//if($result){
 		//	$result = mysql_fetch_array($result);
@@ -234,7 +285,7 @@ class CBDBManager{
 	}
 	
 	function InsertElement($Items,$grp){
-		$sql = "INSERT INTO `".$this->options['mainTable']."` (`CBName`, `CBSong`, `CBTime`, `CBLink`, `CBPOSTTIME`, `CBPOSTDATE`, `CBGroup`) 
+		$sql = "INSERT INTO `".$this->options['mainTable']."` (`CBName`, `CBSong`, `CBTime`, `CBLink`, `CBPOSTTIME`, `CBPOSTDATE`, `CBGroup`, `CBCName`) 
 		VALUES (
 			'".$Items['CBName']."',
 			'".$Items['CBSong']."',
@@ -242,7 +293,7 @@ class CBDBManager{
 			'".$Items['CBLink']."',
 			CURRENT_TIME(),
 			CURRENT_DATE(),
-			'".$grp."'
+			'".$grp."','".sha1($Items['CBName'])."'
 		)";
 		
 		$con = $this->DBLink();
@@ -257,6 +308,45 @@ class CBDBManager{
 	function GetTodayInfo($grp){
 		$link = $this->DBLink();
 		$sql = 'SELECT * FROM `'.$this->options['mainTable'].'` WHERE CBPOSTDATE=CURRENT_DATE() AND CBGroup="'.$grp.'"';
+		
+		$result = mysql_query($sql,$link);
+		$result_arr = array();
+		$userNum = 0;
+		while($row = mysql_fetch_array($result)){
+			foreach($row as $key=>$value){
+				if(!is_numeric($key)){
+					$result_arr[$key.$userNum] = $value;
+				}else{
+					if($key == 0){
+						$userNum++;
+					}
+				}
+			}
+		}
+		$this->todayCount = $userNum;
+		mysql_close($link);
+		return $result_arr;
+	}
+	
+	function FixedSha1(){
+		$link = $this->DBLink();
+		$sql = 'SELECT `CBName` FROM `'.$this->options['mainTable'].'` WHERE 1';
+		echo $sql;
+		$result = mysql_query($sql,$link);
+		while($row = mysql_fetch_array($result)){
+			foreach($row as $key=>$value){
+				echo $key.'=>'.$value;
+				$ssql = 'UPDATE `cbtableothers` SET `CBCName`="'.sha1($value).'" WHERE `CBName`="'.$value.'"';
+				mysql_query($ssql,$link);
+			}
+		}
+		echo 'finished';
+		mysql_close($link);
+	}
+	
+	function GetLastdayInfo($grp){
+		$link = $this->DBLink();
+		$sql = 'SELECT * FROM `'.$this->options['mainTable'].'` WHERE CBPOSTDATE=(CURRENT_DATE()-1) AND CBGroup="'.$grp.'"';
 		
 		$result = mysql_query($sql,$link);
 		$result_arr = array();

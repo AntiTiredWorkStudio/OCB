@@ -13,6 +13,7 @@
 <meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link href="favicon.ico" rel="icon" type="image/ico" />
 
 <link rel="apple-touch-icon-precomposed" sizes="114x114" href="images/splash/splash-icon.png">
 <link rel="apple-touch-startup-image" href="images/splash/splash-screen.png" 			media="screen and (max-device-width: 320px)" />  
@@ -70,11 +71,11 @@
      
     <div class="landing-navigation">
     <div class="landing-navigation-tablet-top-adjustment"></div> 
-    	<a href="#">
+    	<a href="Today.php<?php echo '?g='.$G; ?>">
         	<img class="nav-icon" src="images/icons/misc/home.png" alt="img">
             <div class="nav-overlay"></div>
         	<img class="nav-image" src="images/general-nature/1s.jpg" alt="img">
-            <em>主页</em>
+            <em>今日歌单</em>
         </a>
     	<a href="CB.php<?php echo '?g='.$G; ?>">
         	<img class="nav-icon" src="images/icons/misc/infoabout.png" alt="img">
