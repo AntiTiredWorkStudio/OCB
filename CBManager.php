@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 include_once('KeyChain.php');
 $G = "";
 if(isset($_GET['g'])){
@@ -14,7 +14,8 @@ if(isset($_GET['action'])){
 			new TakeIn();
 			break;
 		case 'initDB':
-			(new CBDBManager($G))->InitTable();
+			if(ConfirmIPIsSafe(GetIP()))
+				(new CBDBManager($G))->InitTable();
 			break;
 		case 'updateList':
 			(new SongListManager($_POST['Content'],$_POST['List'],$G))->UpdateSongList();
@@ -26,19 +27,44 @@ if(isset($_GET['action'])){
 			(new KeyChainManager())->CreateGroup($_POST['GroupName']);
 			break;
 		case 'fixed':
-			(new CBDBManager($G))->FixedSha1();
+			if(ConfirmIPIsSafe(GetIP()))
+				(new CBDBManager($G))->FixedSha1();
+			break;
+		case 'addedGroupFromKeyChain':
+			if(ConfirmIPIsSafe(GetIP()))
+				(new CBDBManager($G))->FixGroup();
+			break;
+		case 'selectAllGroup':
+			if(ConfirmIPIsSafe(GetIP()))
+				(new CBDBManager($G))->SelectAllGroups();
 			break;
 		default:
 			break;
 	}
 }
+
+
 class WeekPlayer{
 	
 }
 class KeyChainManager{
+	//$fallBackTemplate = "<html><head><title>#TITLE#</title></head><body><h1>#INFO#</h1><script>#SCRIPT#</script></body></html>";
 	function CreateGroup($groupName){
 		include("KeyChain.php");
-		$index = 0;
+		if($groupName==""){
+			new CWaitJS('创建结果','Menu.php','群组名称不能为空');
+			return;
+		}
+		$values = [
+			'Group'=>$groupName,
+			'EnrollLink'=>$_POST['EnrollLink'],
+			'SignLink'=>$_POST['SignLink'],
+			'Rule'=>$_POST['Rule']
+		];
+		$result = (new CBDBManager($GLOBALS['G']))->InsertGroup(
+			$values
+		);
+		/*$index = 0;
 		foreach($content as $key=>$value){
 			$index = $key;
 		}
@@ -51,13 +77,20 @@ class KeyChainManager{
 		\'DayMax\' => 5,
 		\'DurMax\' => 3,
 		\'slist\' => \'sources/ListModule_'.$index.'.txt\',
-		\'scontent\' => \'sources/ContentModule_'.$index.'.txt\'
+		\'scontent\' => \'sources/ContentModule_'.$index.'.txt\',
+		\'EnrollLink\' => \'\',
+		\'SignLink\' => \'\',
+		\'Rule\' => \'暂时没有群规\'
 		]
 		//#NEWGROUP#
-		',$ocontent);
-		file_put_contents('sources/ListModule_'.$index.'.txt',$options['defaultSongList']);
-		file_put_contents('sources/ContentModule_'.$index.'.txt',$options['defaultSongItem']);
-		file_put_contents('KeyChain.php',$ncontent);
+		',$ocontent);*/
+		file_put_contents('sources/ListModule_'.$result['index'].'.txt',$options['defaultSongList']);
+		file_put_contents('sources/ContentModule_'.$result['index'].'.txt',$options['defaultSongItem']);
+		//file_put_contents('KeyChain.php',$ncontent);
+		new CWaitJS('创建结果','index.php',$result['succs'],$result['index']);
+	}
+	function GetGroupInfo($max = 25){
+		return (new CBDBManager($GLOBALS['G']))->SelectAllGroups($max);
 	}
 	function KeyChainManager(){
 		
@@ -103,19 +136,19 @@ class CWaitJS{
 				document.getElementById("ShowDiv").innerHTML = "将在"+num+"秒后自动跳转到主页" ;
 				if(num == 0) { window.location = URL; }
 			}';
-	function GetWaitJS($linkPage){
-		$result = str_replace('#GET#',$_GET['g'],$this->WJ);
+	function GetWaitJS($linkPage,$get=''){
+		$result = str_replace('#GET#',(($get=='')?$_GET['g']:$get),$this->WJ);
 		return str_replace('#Page#',$linkPage,$result);
 	}
-	function CWaitJS($title,$linkPage,$resultContent){
+	function CWaitJS($title,$linkPage,$resultContent,$get=''){
 		echo '<html>
 				<title>'.$title.'</title>
 				<body>
 				<ShowDiv id=\'ShowDiv\'></ShowDiv>
 				</br>
-				<a href=\''.$linkPage.'?g='.$_GET['g'].'\'>如果页面未响应请点击此处返回</a>
+				<a href=\''.$linkPage.'?g='.(($get=='')?$_GET['g']:$get).'\'>如果页面未响应请点击此处返回</a>
 				<script language="javascript">alert("'.$resultContent.'");';
-		echo $this->GetWaitJS($linkPage);
+		echo $this->GetWaitJS($linkPage,(($get=='')?$_GET['g']:$get));
 		echo '</script>
 				</body>
 				</html>';
@@ -196,14 +229,14 @@ class TakeIn{
 			$count = 
 				$CBDM->GetTodaySongCount($_GET['g']);
 			//echo($count);
-			if(isset($_SESSION['OnTakein'.sha1($user)]) && $_SESSION['OnTakein'.sha1($user)] == sha1($_POST['User'])){
+			if(isset($_SESSION['OnTakein'.sha1($user).sha1($GLOBALS['G'])]) && $_SESSION['OnTakein'.sha1($user).sha1($GLOBALS['G'])] == sha1($_POST['User'])){
 				echo 'alert("报的太快啦！");'.$this->GetWaitJS();
 			}else
 			if($count>=5){
 				echo 'alert("今天报名人数已经达到'.$count.'人，请明天再来吧");'.$this->GetWaitJS();
 			}else
 			if(!($CBDM->SelectConditionItems($Condition))){
-				$_SESSION['OnTakein'.sha1($user)] = sha1($_POST['User']);
+				$_SESSION['OnTakein'.sha1($user).sha1($GLOBALS['G'])] = sha1($_POST['User']);
 				if($CBDM->InsertElement(
 					$Items,$_GET['g']
 				)){
@@ -256,9 +289,9 @@ class CBDBManager{
 		//echo $sql;
 		$result = mysql_query($sql,$link);
 		
-		if(isset($_SESSION['OnTakein'.$CBN]) && $_SESSION['OnTakein'.$CBN] == $CBN){
+		if(isset($_SESSION['OnTakein'.$CBN.sha1($GLOBALS['G'])]) && $_SESSION['OnTakein'.$CBN.sha1($GLOBALS['G'])] == $CBN){
 			//setcookie('OnTakein'.$CBN,'',time()-1);
-			unset($_SESSION['OnTakein'.$CBN]);
+			unset($_SESSION['OnTakein'.$CBN.sha1($GLOBALS['G'])]);
 		}
 		
 		return $result;
@@ -267,6 +300,11 @@ class CBDBManager{
 	function GetCreateTableCommand(){
 		$result = str_replace("#DB#",$this->options['database'],$this->options['mainTableFormate']);
 		$result = str_replace("#TB#",$this->options['mainTable'],$result);
+		return $result;
+	}
+	function GetCreateGroupTableCommand(){
+		$result = str_replace("#DB#",$this->options['database'],$this->options['groupTableFormate']);
+		$result = str_replace("#TB#",$this->options['groupTable'],$result);
 		return $result;
 	}
 	
@@ -350,6 +388,132 @@ class CBDBManager{
 		return $result_arr;
 	}
 	
+	function SelectGroupWithID($GID){
+		$IDSql = 'select * from cbgroups WHERE GID='.$GID;
+		$groups = [];
+		$link = $this->DBLink();
+		$result = mysql_query($IDSql,$link);
+		while($row = mysql_fetch_array($result)){
+			$groups[$row['GID']] = [
+				'GID' => $row['GID'],
+				'GName' => $row['GName'],
+				'GEnrollLink' => $row['GEnrollLink'],
+				'GSignLink' => $row['GSignLink'],
+				'GRule' => $row['GRule'],
+				'GSLLPath' => $row['GSLLPath'],
+				'GSLIPath' => $row['GSLIPath'],
+				'GPOSTTIME' => $row['GPOSTTIME'],
+				'GPOSTDATE' => $row['GPOSTDATE'],
+				'GDayMax' => $row['GDayMax'],
+				'GDurMax' => $row['GDurMax']
+			];
+		}
+		return $groups;
+	}
+	
+	function SelectAllGroups($max=25){
+		$IDSql = 'select * from cbgroups LIMIT 0,'.$max;
+		//echo $IDSql;
+		$groups = [];
+		$link = $this->DBLink();
+		$result = mysql_query($IDSql,$link);
+		while($row = mysql_fetch_array($result)){
+			$groups[$row['GID']] = [
+				'GID' => $row['GID'],
+				'GName' => $row['GName'],
+				'GEnrollLink' => $row['GEnrollLink'],
+				'GSignLink' => $row['GSignLink'],
+				'GRule' => $row['GRule'],
+				'GSLLPath' => $row['GSLLPath'],
+				'GSLIPath' => $row['GSLIPath'],
+				'GPOSTTIME' => $row['GPOSTTIME'],
+				'GPOSTDATE' => $row['GPOSTDATE'],
+				'GDayMax' => $row['GDayMax'],
+				'GDurMax' => $row['GDurMax']
+			];
+			/*foreach($row as $key=>$value){
+				echo $key.'=>'.$value.'</br>';
+			}*/
+		}
+		mysql_close($link);
+		return $groups;
+	}
+	
+	function SelectGroupName($GID){
+		$IDSql = 'SELECT `GName` FROM `cbgroups` WHERE GID='.$GID;
+		//echo $IDSql;
+		$link = $this->DBLink();
+		$result = mysql_query($IDSql,$link);
+		mysql_close($link);
+		return mysql_fetch_array($result)[0];
+	}
+	
+	function SearchGID($GName){
+		$GNameSql = 'SELECT `GID` FROM `cbgroups` WHERE GName="'.$GName.'"';
+		$link = $this->DBLink();
+		$result = mysql_query($GNameSql,$link);
+		//echo $GNameSql;
+		mysql_close($link);
+		return mysql_fetch_array($result)[0];
+	}
+	
+	function InsertGroup($value){
+		//$content = $GLOBALS['content'];
+		$IDSql = 'select max(`GID`) from cbgroups';
+		
+		$link = $this->DBLink();
+		
+		$Index = mysql_fetch_array(mysql_query($IDSql,$link))[0]+1;
+		
+			$sql='INSERT INTO `cbgroups`(`GID`, `GName`, `GEnrollLink`, `GSignLink`, `GRule`, `GSLLPath`, `GSLIPath`, `GPOSTTIME`, `GPOSTDATE`) 
+			VALUES ("'.$Index.'",
+			"'.$value['Group'].'",
+			"'.$value['EnrollLink'].'",
+			"'.$value['SignLink'].'",
+			"'.$value['Rule'].'",
+			"'.'sources/ListModule_'.$Index.'.txt'.'",
+			"'.'sources/ContentModule_'.$Index.'.txt'.'",
+			CURRENT_TIME(),
+			CURRENT_DATE())';
+			//echo $sql;
+			$result = mysql_query($sql,$link);
+			$succs = '';
+			if($result){
+				$succs = '群组”'.$value['Group'].'”创建成功';
+				//echo '插入成功:'.$Index.'</br>';
+			}else{
+				$succs = '群组”'.$value['Group'].'”创建失败';
+			}
+		mysql_close($link);
+		return ['index'=>$Index,'succs'=>$succs];
+	}
+	function FixGroup(){
+		$content = $GLOBALS['content'];
+		$link = $this->DBLink();
+		foreach($content as $key=>$value){
+			$sql='INSERT INTO `cbgroups`(`GID`, `GName`, `GEnrollLink`, `GSignLink`, `GRule`, `GSLLPath`, `GSLIPath`, `GPOSTTIME`, `GPOSTDATE`) 
+			VALUES ("'.$key.'",
+			"'.$value['Group'].'",
+			"'.$value['EnrollLink'].'",
+			"'.$value['SignLink'].'",
+			"'.$value['Rule'].'",
+			"'.$value['slist'].'",
+			"'.$value['scontent'].'",
+			CURRENT_TIME(),
+			CURRENT_DATE())';
+			echo $sql;
+			$result = mysql_query($sql,$link);
+			if($result){
+				echo '插入成功:'.$key.'</br>';
+			}
+			//echo mysql_num_rows($result);//){
+			//	echo '插入成功:'.$value;
+			//}
+		}
+		echo '插入完成:';
+		mysql_close($link);
+	}
+	
 	function FixedSha1(){
 		$link = $this->DBLink();
 		$sql = 'SELECT `CBName` FROM `'.$this->options['mainTable'].'` WHERE 1';
@@ -401,6 +565,12 @@ class CBDBManager{
 		if(!$this->ExistTable($this->options['mainTable'])){
 			$link = $this->DBLink();
 			mysql_query($this->GetCreateTableCommand(),$link);
+			mysql_close($link);
+		}
+		
+		if(!$this->ExistTable($this->options['groupTable'])){
+			$link = $this->DBLink();
+			mysql_query($this->GetCreateGroupTableCommand(),$link);
 			mysql_close($link);
 		}
 	}

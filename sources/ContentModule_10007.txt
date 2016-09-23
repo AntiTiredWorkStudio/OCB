@@ -1,4 +1,4 @@
-﻿#Index#:
+#Index#:
 	*#UserName#
 	*《#Song#》
 	*#Time#

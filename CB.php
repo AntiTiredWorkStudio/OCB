@@ -1,9 +1,12 @@
 ﻿<?php
 include_once('KeyChain.php');
+include_once('CBManager.php');
 	$G = "";
 	if(isset($_GET['g'])){
 		$G = $_GET['g'];
 	}
+	$CBM = (new CBDBManager($G));
+	$GN =$CBM->SelectGroupName($G);
 ?>
 
 <html>
@@ -12,7 +15,7 @@ include_once('KeyChain.php');
 		<link href="css/style_CB.css" rel="stylesheet" type="text/css" />
 		<link href="favicon.ico" rel="icon" type="image/ico" />
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title><?php echo $content[$G]['Group'];?>歌曲报名处</title>
+		<title><?php echo $GN;?>歌曲报名处</title>
 		<script type="application/x-javascript"> 
 			addEventListener(
 				"load", function() { 
@@ -26,7 +29,7 @@ include_once('KeyChain.php');
  
 <body>
 	<div class="main" style="margin-top: 0px;">
-				 <h2><?php echo $content[$G]['Group'];?>歌曲报名处</h2>
+				 <h2><?php echo $GN;?>歌曲报名处</h2>
 				 <form action="http://<?php echo $options['server']; ?>/OCB/CBManager.php?action=takein&<?php echo 'g='.$G; ?>" method="post"enctype="multipart/form-data">
 							<div class="lable">
 		                     	<input type="text" class="text" id="User" name="User" value="你的称呼" onfocus="if (this.value == '你的称呼')this.value = '';" onblur="if (this.value == '') {this.value = '你的称呼';}" >

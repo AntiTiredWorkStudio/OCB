@@ -1,4 +1,4 @@
-﻿#Date#
+#Date#
 	#GroupName#歌单
 	 #Content#
 	签到:
