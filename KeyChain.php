@@ -16,7 +16,21 @@ $options = [
 							 `CBCName` VARCHAR(128) NOT NULL
 							 ) ENGINE = InnoDB DEFAULT CHARSET=UTF8;',
 	'tcc' => 'SqlTable.txt',
-	'key' => 'cbword'
+	'key' => 'cbword',
+	'defaultSongList'=>'#Date#
+	#GroupName#歌单
+	 #Content#
+	签到:
+	http://changba.com/s/
+	报名:
+	http://changba.com/s/',
+	'defaultSongItem'=>'#Index#:
+	*#UserName#
+	*《#Song#》
+	*#Time#
+	*#Link#
+	
+	'
 	];
 $content = [
 	'10001'=>[
@@ -47,5 +61,17 @@ $content = [
 		'slist' => 'sources/ListModule_10003.txt',
 		'scontent' => 'sources/ContentModule_10003.txt'
 		]
+		,
+		'10005'=>[
+		'Group' => '北京之家',
+		'DayMax' => 5,
+		'DurMax' => 3,
+		'slist' => 'sources/ListModule_10005.txt',
+		'scontent' => 'sources/ContentModule_10005.txt'
+		]
+		//#NEWGROUP#
+		
+		
+		
 	];
 ?>

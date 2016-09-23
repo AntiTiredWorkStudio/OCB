@@ -11,7 +11,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link href="favicon.ico" rel="icon" type="image/ico" />
-	<title><?php echo $content[$G]['Group'];?>歌单</title>
+	<title><?php echo $content[$G]['Group'];?>今日歌单</title>
 	<link rel="stylesheet" href="css/style_Table.css" type="text/css">
 	<link href="css/style_CB.css" rel="stylesheet" type="text/css">
 	<style type="text/css">
@@ -24,7 +24,7 @@
 
 <div align="left" class="container">   
 	<table class="zebra">
-    <caption><?php echo $content[$G]['Group'];?>歌单</caption>
+    <caption><?php echo $content[$G]['Group'];?>今日歌单</caption>
 		<thead>
         	<tr>
 				<th>歌手</th>

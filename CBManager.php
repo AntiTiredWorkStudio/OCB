@@ -23,7 +23,7 @@ if(isset($_GET['action'])){
 			new DeleteItem((new CBDBManager($G))->DeleteItem($_GET['p'],$G));
 			break;
 		case 'creategrp':
-			//(new KeyChainManager())->CreateGroup($_POST['GroupName']);
+			(new KeyChainManager())->CreateGroup($_POST['GroupName']);
 			break;
 		case 'fixed':
 			(new CBDBManager($G))->FixedSha1();
@@ -32,17 +32,32 @@ if(isset($_GET['action'])){
 			break;
 	}
 }
-
+class WeekPlayer{
+	
+}
 class KeyChainManager{
 	function CreateGroup($groupName){
-	/*	include_once("KeyChain.php");
+		include("KeyChain.php");
 		$index = 0;
-		echo $content;*/
-		/*foreach($content as $key=>$value){
+		foreach($content as $key=>$value){
 			$index = $key;
 		}
-		echo $key.$groupName;*/
-		
+		$index++;
+		echo $index.':'.$groupName;
+		$ocontent = file_get_contents('KeyChain.php');
+		$ncontent = str_replace('//#NEWGROUP#',',
+		\''.$index.'\'=>[
+		\'Group\' => \''.$groupName.'\',
+		\'DayMax\' => 5,
+		\'DurMax\' => 3,
+		\'slist\' => \'sources/ListModule_'.$index.'.txt\',
+		\'scontent\' => \'sources/ContentModule_'.$index.'.txt\'
+		]
+		//#NEWGROUP#
+		',$ocontent);
+		file_put_contents('sources/ListModule_'.$index.'.txt',$options['defaultSongList']);
+		file_put_contents('sources/ContentModule_'.$index.'.txt',$options['defaultSongItem']);
+		file_put_contents('KeyChain.php',$ncontent);
 	}
 	function KeyChainManager(){
 		
@@ -140,6 +155,7 @@ class TakeIn{
 		$Time = $_POST['Time'];
 		$Link = $_POST['Link'];
 		$TakeInResult = true;
+		session_start();
 		echo '<html>
 				<title>报名结果</title>
 				<body>
@@ -180,14 +196,14 @@ class TakeIn{
 			$count = 
 				$CBDM->GetTodaySongCount($_GET['g']);
 			//echo($count);
-			if(isset($_COOKIE['OnTakein'.md5($user)]) && $_COOKIE['OnTakein'.md5($user)] == sha1($_POST['User'])){
+			if(isset($_SESSION['OnTakein'.sha1($user)]) && $_SESSION['OnTakein'.sha1($user)] == sha1($_POST['User'])){
 				echo 'alert("报的太快啦！");'.$this->GetWaitJS();
 			}else
 			if($count>=5){
 				echo 'alert("今天报名人数已经达到'.$count.'人，请明天再来吧");'.$this->GetWaitJS();
 			}else
 			if(!($CBDM->SelectConditionItems($Condition))){
-				setcookie('OnTakein'.md5($user),sha1($_POST['User']),time()+3600);
+				$_SESSION['OnTakein'.sha1($user)] = sha1($_POST['User']);
 				if($CBDM->InsertElement(
 					$Items,$_GET['g']
 				)){
@@ -239,6 +255,12 @@ class CBDBManager{
 		$sql = "delete from cbtableothers where CBPOSTDATE=CURRENT_DATE() AND CBCName='".$CBN."'". "AND CBGroup='".$grp."'";
 		//echo $sql;
 		$result = mysql_query($sql,$link);
+		
+		if(isset($_SESSION['OnTakein'.$CBN]) && $_SESSION['OnTakein'.$CBN] == $CBN){
+			//setcookie('OnTakein'.$CBN,'',time()-1);
+			unset($_SESSION['OnTakein'.$CBN]);
+		}
+		
 		return $result;
 	}
 	

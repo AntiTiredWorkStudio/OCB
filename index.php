@@ -87,7 +87,7 @@
         	<img class="nav-icon" src="images/icons/settings/cog4.png" alt="img">
             <div class="nav-overlay"></div>
         	<img class="nav-image" src="images/general-nature/2s.jpg" alt="img">
-            <em>查看歌单</em>
+            <em>明日歌单</em>
         </a>
     	<a href="Model.php<?php echo '?g='.$G; ?>">
         	<img class="nav-icon" src="images/icons/electrical/camera.png" alt="img">
