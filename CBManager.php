@@ -38,6 +38,10 @@ if(isset($_GET['action'])){
 			if(ConfirmIPIsSafe(GetIP()))
 				(new CBDBManager($G))->SelectAllGroups();
 			break;
+		case 'a':
+			echo (new CBDBManager($G))->GetPublicDurnationOfPlayer('鳯','10001');
+			
+			break;
 		default:
 			break;
 	}
@@ -103,18 +107,16 @@ class SongListManager{
 	var $g = '';
 	var $co = '';
 	function SongListManager($_content,$list,$groupID){
-		include('KeyChain.php');
+		//include('KeyChain.php');
 		$this->c=$_content;
 		$this->l=$list;
 		$this->g=$groupID;
-//		if(isset($content))
-		$this->co=$content;
-		//echo $_content.$list.$groupID;//.$content;
+		$this->co = (new CBDBManager($GLOBALS['G']))->SelectGroupWithID($groupID);
 	}
 	
 	function UpdateSongList(){
-		file_put_contents($this->co[$this->g]['scontent'],$this->c);
-		file_put_contents($this->co[$this->g]['slist'],$this->l);
+		file_put_contents($this->co[$this->g]['GSLIPath'],$this->c);
+		file_put_contents($this->co[$this->g]['GSLLPath'],$this->l);
 		new CWaitJS('报名结果','index.php','修改成功');
 	}
 }
@@ -226,25 +228,32 @@ class TakeIn{
 		];
 		if($TakeInResult){
 			$CBDM = new CBDBManager($_GET['g']);
+			
+			$DayDur= $CBDM->SelectGDayDur($_GET['g']);['GDayMax'];
+			// (new CBDBManager($G))->SelectGDayDur(10001)['GDurMax'];
 			$count = 
 				$CBDM->GetTodaySongCount($_GET['g']);
 			//echo($count);
 			if(isset($_SESSION['OnTakein'.sha1($user).sha1($GLOBALS['G'])]) && $_SESSION['OnTakein'.sha1($user).sha1($GLOBALS['G'])] == sha1($_POST['User'])){
 				echo 'alert("报的太快啦！");'.$this->GetWaitJS();
 			}else
-			if($count>=5){
+			if($count>=$DayDur['GDayMax']){
 				echo 'alert("今天报名人数已经达到'.$count.'人，请明天再来吧");'.$this->GetWaitJS();
 			}else
 			if(!($CBDM->SelectConditionItems($Condition))){
-				$_SESSION['OnTakein'.sha1($user).sha1($GLOBALS['G'])] = sha1($_POST['User']);
-				if($CBDM->InsertElement(
-					$Items,$_GET['g']
-				)){
-					echo 'alert("报名成功");'.$this->GetWaitJS();
-					//Header("Location: CB.html"); 
+				if($CBDM->GetPublicDurnationOfPlayer($user,$GLOBALS['G'])>$DayDur['GDurMax']){
+					$_SESSION['OnTakein'.sha1($user).sha1($GLOBALS['G'])] = sha1($_POST['User']);
+					if($CBDM->InsertElement(
+						$Items,$_GET['g']
+					)){
+						echo 'alert("报名成功");'.$this->GetWaitJS();
+						//Header("Location: CB.html"); 
+					}
+				}else{
+					echo 'alert("根据群规，您在'.$DayDur['GDurMax'].'天内报过名了，为了家人着想，不能再报了。");'.$this->GetWaitJS();
 				}
 			}else{
-				echo 'alert("报名失败，您已在三天内报过名了");'.$this->GetWaitJS();
+				echo 'alert("您报过名了");'.$this->GetWaitJS();
 			}
 		}
 		echo '</script>
@@ -333,6 +342,38 @@ class CBDBManager{
 		return mysql_num_rows($result);
 	}
 	
+	function GetPublicDurnationOfPlayer($PlayerName,$groupID){
+		$link = $this->DBLink();
+		$sqlP = 'select `CBLink` from cbtableothers where `CBName`="'.$PlayerName.'" limit 1';
+		$result = mysql_query($sqlP,$link);
+		$url = mysql_fetch_array($result)[0];
+		$sql = 'select `CBPOSTDATE` from cbtableothers where (`CBPOSTDATE` = (select `CBPOSTDATE` from cbtableothers  WHERE (`CBLink`= "'.$url .'" and `CBGroup`="'.$groupID.'") order by `CBPOSTDATE` desc limit 1)) limit 1';
+		$result = mysql_query($sql,$link);
+		$final = mysql_fetch_array($result)[0];
+		mysql_close($link);
+		$date=strtotime($final);
+		$today = date(time());
+		
+		 $a_dt = getdate($date);
+
+		$b_dt = getdate($today);
+
+		$a_new = mktime(12, 0, 0, $a_dt['mon'], $a_dt['mday'], $a_dt['year']);
+
+		$b_new = mktime(12, 0, 0, $b_dt['mon'], $b_dt['mday'], $b_dt['year']);
+
+		return round(abs($a_new-$b_new)/86400);
+	}
+	
+	function SelectGDayDur($groupID){
+		$con = $this->DBLink();
+		$sql = 'SELECT `GDayMax`, `GDurMax` FROM `cbgroups` WHERE `GID`='.$groupID;
+		$result = 
+			mysql_query($sql,$con);
+		$final = mysql_fetch_array($result);
+		return $final;
+	}
+	
 	function ExistTable($tableName){
 		$con = $this->DBLink();
 		$result =mysql_fetch_row(mysql_query("SHOW TABLES LIKE '".$tableName."' ",$con));
@@ -387,7 +428,6 @@ class CBDBManager{
 		mysql_close($link);
 		return $result_arr;
 	}
-	
 	function SelectGroupWithID($GID){
 		$IDSql = 'select * from cbgroups WHERE GID='.$GID;
 		$groups = [];
@@ -438,7 +478,7 @@ class CBDBManager{
 		mysql_close($link);
 		return $groups;
 	}
-	
+//	function Sel
 	function SelectGroupName($GID){
 		$IDSql = 'SELECT `GName` FROM `cbgroups` WHERE GID='.$GID;
 		//echo $IDSql;

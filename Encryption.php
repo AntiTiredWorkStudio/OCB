@@ -1,5 +1,5 @@
 ﻿<?php
-	$SafeList = ['117.100.88.67','127.0.0.1'];
+	$SafeList = ['115.159.121.254','117.100.88.67','127.0.0.1'];
 	function ConfirmIPIsSafe($IP){
 		$SafeList = $GLOBALS['SafeList'];
 		for($x=0;$x<count($SafeList);$x++){

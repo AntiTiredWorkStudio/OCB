@@ -3,10 +3,15 @@
 <head>
 	<?php 
 		include_once('KeyChain.php');
+		include_once('CBManager.php');
 		$G = "";
 		if(isset($_GET['g'])){
 			$G = $_GET['g'];
 		}
+		$CBM = (new CBDBManager($G));
+		$GN =$CBM->SelectGroupName($G);
+		
+		//echo file_get_contents('http://115.159.121.254/OCB/GetLink.php?PSong=下定决心忘记你&PLink=http://changba.com/u/229780482');
 	?>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
@@ -19,7 +24,7 @@
 <style type="text/css">
     .btn{width:323.5px;padding:0;cursor:pointer;display:inline-block;text-align:center;border:1x solid transparent;-webkit-border-radius:2px;-moz-border-radius:2px;border-radius:2px;height:45px;line-height:30px;font-family:"Microsoft Yahei";font-size:15px;padding:0 15px;border-color:#EC0000;background:#FF6B6B;color:#fff;}
 </style>
-<title><?php echo $content[$G]['Group'];?>周精选</title>
+<title><?php echo $GN;?>周精选</title>
 
 </head>
 <body>
