@@ -1,10 +1,11 @@
-<?php
+﻿<?php
 $options = [
 	'server' => '115.159.121.254',
     'user'  => 'konglf2112',
     'password'  => '3226460036',
 	'database' => 'CBDB' ,
 	'mainTable' => 'CBTableOthers',
+	'groupTable' => 'CBGroups',
 	'mainTableFormate' => 'CREATE TABLE #DB#.#TB# 
 							(`CBName` VARCHAR(32) NOT NULL ,
 							 `CBSong` VARCHAR(32) NOT NULL ,
@@ -15,6 +16,19 @@ $options = [
 							 `CBGroup` VARCHAR(32) NOT NULL,
 							 `CBCName` VARCHAR(128) NOT NULL
 							 ) ENGINE = InnoDB DEFAULT CHARSET=UTF8;',
+	'groupTableFormate' => 'CREATE TABLE `cbgroups` (
+  `GID` varchar(32) NOT NULL,
+  `GName` varchar(32) NOT NULL,
+  `GEnrollLink` varchar(128) NOT NULL,
+  `GSignLink` varchar(128) NOT NULL,
+  `GRule` varchar(360) NOT NULL,
+  `GSLLPath` varchar(128) NOT NULL,
+  `GSLIPath` varchar(128) NOT NULL,
+  `GPOSTTIME` time NOT NULL,
+  `GPOSTDATE` date NOT NULL,
+  `GDayMax` int(11) NOT NULL DEFAULT \'5\',
+  `GDurMax` int(11) NOT NULL DEFAULT \'3\'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 	'tcc' => 'SqlTable.txt',
 	'key' => 'cbword',
 	'defaultSongList'=>'#Date#
@@ -32,7 +46,7 @@ $options = [
 	
 	'
 	];
-$content = [
+/*$content = [
 	'10001'=>[
 		'Group' => '自由联盟',
 		'DayMax' => 5,
@@ -73,5 +87,5 @@ $content = [
 		
 		
 		
-	];
+	];*/
 ?>

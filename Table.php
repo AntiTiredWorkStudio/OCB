@@ -1,4 +1,4 @@
-<html>
+﻿<html>
 <head>
 	<?php 
 		include_once('KeyChain.php');
@@ -7,11 +7,14 @@
 		if(isset($_GET['g'])){
 			$G = $_GET['g'];
 		}
+		$CBM = (new CBDBManager($G));
+		$GN =$CBM->SelectGroupName($G);
+		$GA =$CBM->SelectGroupWithID($G);
 	?>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link href="favicon.ico" rel="icon" type="image/ico" />
-	<title><?php echo $content[$G]['Group'];?>歌单</title>
+	<title><?php echo $GN;?>歌单</title>
 	<link rel="stylesheet" href="css/style_Table.css" type="text/css">
 	<link href="css/style_CB.css" rel="stylesheet" type="text/css">
 	<style type="text/css">
@@ -24,7 +27,7 @@
 
 <div align="left" class="container">   
 	<table class="zebra">
-    <caption><?php echo $content[$G]['Group'];?>歌单</caption>
+    <caption><?php echo $GN;?>歌单</caption>
 		<thead>
         	<tr>
 				<th>歌手</th>
@@ -40,10 +43,10 @@
 		<input type="button" class="btn" style="margin-top: 20px;" onclick="window.location.href=\'#GET#\'" value="#btContent#" ></div>';
 				$buttonList = "";
 				$eachButton = "";
-				$scontent = file_get_contents($content[$G]['scontent']);
-				$slist = file_get_contents($content[$G]['slist']);
+				$scontent = file_get_contents($GA[$G]['GSLIPath']);
+				$slist = file_get_contents($GA[$G]['GSLLPath']);
 				$date = date("Y-m-d",strtotime("+1 day"));
-				$group = $content[$G]['Group'];
+				$group = $GA[$G]['GName'];
 				$TodaySongs = (new CBDBManager($G))->GetTodayInfo($G);
 				$content = "";
 				$totalContent = "";

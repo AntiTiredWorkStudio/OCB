@@ -1,12 +1,17 @@
 ﻿<!DOCTYPE HTML>
 <?php 
 	include_once('KeyChain.php');
+	include_once('CBManager.php');
 	$G = "";
 	if(isset($_GET['g'])){
 		$G = $_GET['g'];
+		if($_GET['g'] == ''){
+			$G = '10001';
+		}
 	}else{
 		$G = '10001';
 	}
+	$GN = (new CBDBManager($G))->SelectGroupName($G);
 ?>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=gbk" />
@@ -24,7 +29,7 @@
 <link rel="apple-touch-startup-image" sizes="1536x2008" href="images/splash/splash-screen-ipad-portrait-retina.png"   media="(device-width: 768px)	and (orientation: portrait)	and (-webkit-device-pixel-ratio: 2)"/>
 <link rel="apple-touch-startup-image" sizes="1496x2048" href="images/splash/splash-screen-ipad-landscape-retina.png"   media="(device-width: 768px)	and (orientation: landscape)	and (-webkit-device-pixel-ratio: 2)"/>
 
-<title><?php echo $content[$G]['Group'];?>首页</title>
+<title><?php echo $GN;?>首页</title>
 
 <link href="styles/style.css"     		rel="stylesheet" type="text/css">
 <link href="styles/framework.css" 		rel="stylesheet" type="text/css">
@@ -64,7 +69,7 @@
 	<a class="landing-logo" href="#">
     	<img src="images/misc/logo.png" alt="img">
     </a>
-	<div class="landing-logo" align="center" style="font-family: STKaiti;font-size: 32px;"><?php include('KeyChain.php'); echo $content[$G]['Group'];?></div>
+	<div class="landing-logo" align="center" style="font-family: STKaiti;font-size: 32px;"><?php echo $GN;?></div>
     
     <div class="decoration"></div>
       
@@ -117,9 +122,9 @@
     <div class="footer">
     
     	<div class="socials">
-            <a href="#" class="twitter-icon"></a>
-            <a href="#" class="google-icon"></a>
-            <a href="#" class="facebook-icon"></a>
+            <a href="Menu.php" class="twitter-icon"></a>
+            <a href="Menu.php" class="google-icon"></a>
+            <a href="Menu.php" class="facebook-icon"></a>
         </div>
         <div class="clear"></div>
         <p class="copyright">

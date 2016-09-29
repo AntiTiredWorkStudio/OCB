@@ -1,0 +1,7 @@
+#Date#
+	#GroupName#歌单
+	 #Content#
+	签到:
+	http://changba.com/s/
+	报名:
+	http://changba.com/s/
